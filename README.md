@@ -599,3 +599,615 @@ Chapter 3
 **Chapter 3에서는 `main.py`의 코드를 기능별로 나누어 설명하고, 실제 실행 결과와 함께 프로그램 구현 과정을 기록한다.**
 
 
+# 🐍 Chapter 3. Python 프로그램 구현
+
+> **데이터 구조 → 메뉴 → 기능별 함수 → 사용자 입력 → 기능 테스트**
+
+---
+
+## 3-1. 프로그램 구현 목표
+
+### 🎯 구현할 기능
+
+| 번호 | 기능 | 설명 |
+|---:|---|---|
+| 1 | ➕ 프롬프트 추가 | 새로운 프롬프트 등록 |
+| 2 | 📋 프롬프트 목록 | 전체 프롬프트 확인 |
+| 3 | 🗂️ 카테고리별 조회 | 특정 카테고리만 확인 |
+| 4 | 🔍 프롬프트 검색 | 제목 또는 내용 검색 |
+| 5 | 📖 상세 보기 | 선택한 프롬프트의 전체 내용 확인 |
+| 6 | ⭐ 즐겨찾기 관리 | 즐겨찾기 추가/해제 |
+| 7 | ⭐ 즐겨찾기 목록 | 즐겨찾기만 모아서 확인 |
+| 0 | 🚪 종료 | 프로그램 종료 |
+
+---
+
+## 3-2. 기본 데이터 설계
+
+## 데이터를 저장할 구조
+
+각 프롬프트는 다음 네 가지 정보를 가짐
+
+- 📝 제목
+- 📄 내용
+- 🗂️ 카테고리
+- ⭐ 즐겨찾기 여부
+
+Python에서는 하나의 프롬프트를 **딕셔너리(Dictionary)**로 표현하고,
+여러 개의 프롬프트는 **리스트(List)**에 저장함.
+
+### 📦 데이터 구조
+
+```python
+prompts = [
+    {
+        "title": "블로그 글 작성 도우미",
+        "content": "주어진 주제에 대해 블로그 글을 작성해주세요.",
+        "category": "텍스트 생성",
+        "favorite": False
+    },
+    {
+        "title": "AI 광고 이미지 생성",
+        "content": "제품의 특징을 분석하여 광고 이미지를 생성해주세요.",
+        "category": "이미지 생성",
+        "favorite": False
+    },
+    {
+        "title": "전문가 페르소나 설정",
+        "content": "당신은 해당 분야의 전문 컨설턴트입니다.",
+        "category": "페르소나",
+        "favorite": True
+    }
+]
+
+```
+
+## 3-3. 기본 카테고리 정의
+
+```python
+categories = [
+    "텍스트 생성",
+    "이미지 생성",
+    "영상 생성",
+    "페르소나",
+    "자동화",
+    "기타"
+]
+```
+*** 🗂️ 카테고리 ***
+| 카테고리      | 사용 목적        |
+| --------- | ------------ |
+| ✍️ 텍스트 생성 | 글쓰기, 요약, 보고서 |
+| 🎨 이미지 생성 | 이미지 제작       |
+| 🎬 영상 생성  | 영상 및 광고 제작   |
+| 👤 페르소나   | 역할 및 전문가 설정  |
+| ⚙️ 자동화    | 반복 업무 자동화    |
+| 📦 기타     | 기타 프롬프트      |
+
+## 3-4. 메인 메뉴 구현
+
+```
+def show_menu():
+    print()
+    print("=" * 40)
+    print("       🧠 My Prompt Manager")
+    print("=" * 40)
+    print("1. ➕ 프롬프트 추가")
+    print("2. 📋 프롬프트 목록")
+    print("3. 🗂️ 카테고리별 조회")
+    print("4. 🔍 프롬프트 검색")
+    print("5. 📖 프롬프트 상세 보기")
+    print("6. ⭐ 즐겨찾기 관리")
+    print("7. ⭐ 즐겨찾기 목록")
+    print("0. 🚪 종료")
+    print("=" * 40)
+```
+
+*** 💡 함수로 분리한 이유 ***
+메뉴 출력 코드를 show_menu() 함수로 분리하면
+메인 프로그램에서 필요할 때마다 함수를 호출할 수 있다.
+```
+show_menu()
+```
+
+## 3-5. 프롬프트 추가 기능
+
+### 입력받는 정보
+
+```
+제목
+내용
+카테고리
+```
+
+사용자가 빈 값을 입력하면 다시 입력하도록 처리한다.
+
+### ➕ 입력 과정
+
+```
+=== 프롬프트 추가 ===
+
+제목: 회의록 요약 도우미
+내용: 회의 내용을 결정사항과 Action Items 중심으로 정리해주세요.
+
+카테고리 선택:
+1) 텍스트 생성
+2) 이미지 생성
+3) 영상 생성
+4) 페르소나
+5) 자동화
+6) 기타
+
+선택: 1
+
+✅ 프롬프트가 추가되었습니다!
+```
+
+### 💻 함수 구조
+```
+def add_prompt():
+    print("\n=== 프롬프트 추가 ===")
+
+    title = input("제목: ").strip()
+
+    while not title:
+        print("⚠️ 제목은 비워둘 수 없습니다.")
+        title = input("제목: ").strip()
+
+    content = input("내용: ").strip()
+
+    while not content:
+        print("⚠️ 내용은 비워둘 수 없습니다.")
+        content = input("내용: ").strip()
+
+    print("\n카테고리 선택:")
+
+    for i, category in enumerate(categories, 1):
+        print(f"{i}) {category}")
+
+    while True:
+        choice = input("선택: ").strip()
+
+        if choice.isdigit() and 1 <= int(choice) <= len(categories):
+            category = categories[int(choice) - 1]
+            break
+
+        print("⚠️ 올바른 카테고리 번호를 입력해주세요.")
+
+    new_prompt = {
+        "title": title,
+        "content": content,
+        "category": category,
+        "favorite": False
+    }
+
+    prompts.append(new_prompt)
+
+    print("\n✅ 프롬프트가 추가되었습니다!")
+```
+
+## 3-6. 프롬프트 목록 기능
+
+목록에서는 다음 정보를 표시한다.
+
+```
+번호
+카테고리
+제목
+즐겨찾기 여부
+```
+
+### 📋 실행 예시
+```
+=== 프롬프트 목록 ===
+
+1. [텍스트 생성] 블로그 글 작성 도우미
+2. [이미지 생성] AI 광고 이미지 생성
+3. [페르소나] 전문가 페르소나 설정 ⭐
+4. [자동화] 회의록 정리 도우미
+
+총 4개의 프롬프트
+```
+
+### 💻 함수
+```
+def show_list():
+    print("\n=== 프롬프트 목록 ===")
+
+    if not prompts:
+        print("📭 등록된 프롬프트가 없습니다.")
+        return
+
+    for i, prompt in enumerate(prompts, 1):
+        favorite = " ⭐" if prompt["favorite"] else ""
+
+        print(
+            f"{i}. "
+            f"[{prompt['category']}] "
+            f"{prompt['title']}"
+            f"{favorite}"
+        )
+
+    print(f"\n총 {len(prompts)}개의 프롬프트")
+```
+
+## 3-7. 카테고리별 조회
+
+### 🗂️ 실행 예시
+```
+=== 카테고리별 조회 ===
+
+1) 텍스트 생성
+2) 이미지 생성
+3) 영상 생성
+4) 페르소나
+5) 자동화
+6) 기타
+
+선택: 1
+
+[텍스트 생성]
+
+1. 블로그 글 작성 도우미
+2. 회의록 요약 도우미
+
+총 2개의 프롬프트
+```
+
+### 💻 함수
+```
+def show_by_category():
+    print("\n=== 카테고리별 조회 ===")
+
+    for i, category in enumerate(categories, 1):
+        print(f"{i}) {category}")
+
+    choice = input("선택: ").strip()
+
+    if not choice.isdigit():
+        print("⚠️ 올바른 번호를 입력해주세요.")
+        return
+
+    index = int(choice) - 1
+
+    if index < 0 or index >= len(categories):
+        print("⚠️ 존재하지 않는 카테고리입니다.")
+        return
+
+    selected_category = categories[index]
+
+    print(f"\n[{selected_category}]")
+
+    count = 0
+
+    for i, prompt in enumerate(prompts, 1):
+        if prompt["category"] == selected_category:
+            favorite = " ⭐" if prompt["favorite"] else ""
+            print(f"{i}. {prompt['title']}{favorite}")
+            count += 1
+
+    if count == 0:
+        print("📭 해당 카테고리에 등록된 프롬프트가 없습니다.")
+    else:
+        print(f"\n총 {count}개의 프롬프트")
+```
+
+## 3-8. 프롬프트 검색
+
+색 기능에서는 사용자가 입력한 키워드가
+
+* 제목
+* 내용
+
+중 하나에 포함되어 있는지 확인한다.
+
+### 🔍 실행 예시
+```
+=== 프롬프트 검색 ===
+
+검색어: 광고
+
+검색 결과:
+
+1. [이미지 생성] AI 광고 이미지 생성
+
+총 1개의 프롬프트를 찾았습니다.
+```
+### 💻 함수
+```
+def search_prompt():
+    print("\n=== 프롬프트 검색 ===")
+
+    keyword = input("검색어: ").strip().lower()
+
+    if not keyword:
+        print("⚠️ 검색어를 입력해주세요.")
+        return
+
+    results = []
+
+    for i, prompt in enumerate(prompts, 1):
+        title = prompt["title"].lower()
+        content = prompt["content"].lower()
+
+        if keyword in title or keyword in content:
+            results.append((i, prompt))
+
+    if not results:
+        print("🔎 검색 결과가 없습니다.")
+        return
+
+    print("\n검색 결과:")
+
+    for i, prompt in results:
+        favorite = " ⭐" if prompt["favorite"] else ""
+
+        print(
+            f"{i}. "
+            f"[{prompt['category']}] "
+            f"{prompt['title']}"
+            f"{favorite}"
+        )
+
+    print(f"\n총 {len(results)}개의 프롬프트를 찾았습니다.")
+```
+
+## 3-9. 프롬프트 상세 보기
+
+### 📖 실행 예시
+```
+=== 프롬프트 상세 보기 ===
+
+번호 입력: 1
+
+────────────────────────────
+제목: 블로그 글 작성 도우미
+카테고리: 텍스트 생성
+즐겨찾기: -
+────────────────────────────
+
+내용:
+
+주어진 주제에 대해 SEO에 최적화된
+블로그 글을 작성해주세요.
+
+────────────────────────────
+```
+### 💻 함수
+```
+def show_detail():
+    print("\n=== 프롬프트 상세 보기 ===")
+
+    if not prompts:
+        print("📭 등록된 프롬프트가 없습니다.")
+        return
+
+    choice = input("번호 입력: ").strip()
+
+    if not choice.isdigit():
+        print("⚠️ 올바른 번호를 입력해주세요.")
+        return
+
+    index = int(choice) - 1
+
+    if index < 0 or index >= len(prompts):
+        print("⚠️ 존재하지 않는 번호입니다.")
+        return
+
+    prompt = prompts[index]
+
+    favorite = "⭐" if prompt["favorite"] else "-"
+
+    print("\n" + "─" * 30)
+    print(f"제목: {prompt['title']}")
+    print(f"카테고리: {prompt['category']}")
+    print(f"즐겨찾기: {favorite}")
+    print("─" * 30)
+    print("내용:")
+    print(prompt["content"])
+    print("─" * 30)
+```
+
+### 3-10. 즐겨찾기 관리
+사용자가 프롬프트 번호를 입력하면
+```
+False → True
+True → False
+```
+형태로 상태를 변경한다.
+
+### ⭐ 실행 예시
+```
+=== 즐겨찾기 관리 ===
+
+프롬프트 번호 입력: 2
+
+⭐ 'AI 광고 이미지 생성'
+프롬프트를 즐겨찾기에 추가했습니다!
+```
+다시 선택하면:
+```
+☆ 'AI 광고 이미지 생성'
+프롬프트의 즐겨찾기를 해제했습니다!
+```
+
+###
+```
+def toggle_favorite():
+    print("\n=== 즐겨찾기 관리 ===")
+
+    if not prompts:
+        print("📭 등록된 프롬프트가 없습니다.")
+        return
+
+    choice = input("프롬프트 번호 입력: ").strip()
+
+    if not choice.isdigit():
+        print("⚠️ 올바른 번호를 입력해주세요.")
+        return
+
+    index = int(choice) - 1
+
+    if index < 0 or index >= len(prompts):
+        print("⚠️ 존재하지 않는 번호입니다.")
+        return
+
+    prompt = prompts[index]
+
+    prompt["favorite"] = not prompt["favorite"]
+
+    if prompt["favorite"]:
+        print(
+            f"⭐ '{prompt['title']}' "
+            "프롬프트를 즐겨찾기에 추가했습니다!"
+        )
+    else:
+        print(
+            f"☆ '{prompt['title']}' "
+            "프롬프트의 즐겨찾기를 해제했습니다!"
+        )
+```
+
+## 3-11. 즐겨찾기 목록
+
+### 💻 함수
+```
+def show_favorites():
+    print("\n=== ⭐ 즐겨찾기 목록 ===")
+
+    favorite_count = 0
+
+    for i, prompt in enumerate(prompts, 1):
+        if prompt["favorite"]:
+            print(
+                f"{i}. "
+                f"[{prompt['category']}] "
+                f"{prompt['title']} ⭐"
+            )
+
+            favorite_count += 1
+
+    if favorite_count == 0:
+        print("⭐ 등록된 즐겨찾기가 없습니다.")
+    else:
+        print(f"\n총 {favorite_count}개의 즐겨찾기")
+```
+
+## 3-12. 메인 프로그램 연결
+```
+def main():
+    while True:
+        show_menu()
+
+        choice = input("선택: ").strip()
+
+        if choice == "1":
+            add_prompt()
+
+        elif choice == "2":
+            show_list()
+
+        elif choice == "3":
+            show_by_category()
+
+        elif choice == "4":
+            search_prompt()
+
+        elif choice == "5":
+            show_detail()
+
+        elif choice == "6":
+            toggle_favorite()
+
+        elif choice == "7":
+            show_favorites()
+
+        elif choice == "0":
+            print("\n👋 프로그램을 종료합니다.")
+            break
+
+        else:
+            print("\n⚠️ 올바른 메뉴 번호를 입력해주세요.")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+## 3-13.전체 프로그램 구조
+```
+main.py
+│
+├── prompts
+│   └── 기본 프롬프트 데이터
+│
+├── categories
+│   └── 카테고리 목록
+│
+├── show_menu()
+│   └── 메인 메뉴 출력
+│
+├── add_prompt()
+│   └── 프롬프트 추가
+│
+├── show_list()
+│   └── 전체 목록
+│
+├── show_by_category()
+│   └── 카테고리별 조회
+│
+├── search_prompt()
+│   └── 키워드 검색
+│
+├── show_detail()
+│   └── 상세 보기
+│
+├── toggle_favorite()
+│   └── 즐겨찾기 추가/해제
+│
+├── show_favorites()
+│   └── 즐겨찾기 목록
+│
+└── main()
+    └── 전체 프로그램 실행
+```
+
+## 3-14. 입력 오류 처리
+
+| 상황              | 처리              |
+| --------------- | --------------- |
+| 존재하지 않는 메뉴 번호   | ⚠️ 안내 후 메뉴로 돌아감 |
+| 빈 제목            | ⚠️ 다시 입력        |
+| 빈 내용            | ⚠️ 다시 입력        |
+| 잘못된 카테고리        | ⚠️ 다시 선택        |
+| 존재하지 않는 프롬프트 번호 | ⚠️ 안내           |
+| 빈 검색어           | ⚠️ 다시 입력        |
+| 검색 결과 없음        | 🔎 결과 없음 안내     |
+
+## 3-15. Python 기초 문법의 실제 적용
+| 문법         | 실제 적용                           |
+| ---------- | ------------------------------- |
+| 변수         | `choice`, `keyword`, `category` |
+| 리스트        | `prompts`, `categories`         |
+| 딕셔너리       | 개별 프롬프트 데이터                     |
+| `if`       | 메뉴 및 입력값 판단                     |
+| `for`      | 프롬프트 목록 탐색                      |
+| `while`    | 메뉴 반복 및 입력 검증                   |
+| 함수         | 기능별 코드 분리                       |
+| `input()`  | 사용자 입력                          |
+| `print()`  | 결과 출력                           |
+| `append()` | 새로운 프롬프트 추가                     |
+
+## 3-16. Chapter 3 개발 결과
+현재 구현된 기능은 다음과 같다.
+
+ ➕ 프롬프트 추가
+ 📋 프롬프트 목록
+ 🗂️ 카테고리별 조회
+ 🔍 프롬프트 검색
+ 📖 프롬프트 상세 보기
+ ⭐ 즐겨찾기 추가/해제
+ ⭐ 즐겨찾기 목록
+ ⚠️ 입력 오류 처리
+ 🧩 기능별 함수 분리
+
