@@ -1211,3 +1211,222 @@ main.py
  ⚠️ 입력 오류 처리
  🧩 기능별 함수 분리
 
+# 🌿 Chapter 4. Git / GitHub 버전 관리
+
+
+ **Git과 GitHub를 이용하여 프로젝트의 변경 이력을 관리한다.**
+
+이번 프로젝트에서는 단순히 GitHub에 최종 코드를 업로드하는 것이 아니라,
+
+> **기능 개발 → 커밋 → 브랜치 개발 → 병합 → 원격 저장소 Push**
+
+의 전체 과정을 직접 경험하는 것을 목표로 한다.
+
+---
+
+## 4-1. Git을 사용하는 이유
+
+Git은 프로젝트의 코드 변경 이력을 기록하고 관리하기 위한 버전 관리 시스템이다.
+
+이번 프로젝트에서는 기능을 하나씩 완성할 때마다 커밋을 생성하여
+어떤 기능이 언제 추가되었는지 확인할 수 있도록 한다.
+
+## 4-2. Git 저장소 초기화
+
+프로젝트 폴더에서 Git 저장소를 생성한다.
+```
+git init
+```
+정상적으로 실행되면 현재 프로젝트 폴더가 Git 저장소로 초기화된다.
+
+확인:
+```
+git status
+```
+예상 결과:
+```
+On branch main
+
+No commits yet
+```
+이제 My-Prompt-Manager 폴더는 Git으로 관리할 수 있는 프로젝트가 되었다.
+
+## 4-3. 기본 브랜치 확인
+확인:
+```
+git branch
+```
+또는 초기 설정:
+```
+git config --global init.defaultBranch main
+```
+현재 브랜치:
+```
+* main
+```
+* 표시가 현재 작업 중인 브랜치를 의미한다.
+
+## 4-4. 첫 번째 Git 커밋
+프로젝트의 파일을 Git의 관리 대상으로 추가한다.
+```
+git add .
+```
+변경 상태 확인:
+```
+git status
+```
+이후 첫 번째 커밋을 생성한다.
+```
+git commit -m "chore: initialize project"
+```
+📌 첫 번째 커밋의 의미
+
+이 커밋은 프로젝트의 기본 구조를 기록한다.
+```
+My-Prompt-Manager
+├── main.py
+├── README.md
+└── .gitignore
+```
+
+## 4-5. 기능별 커밋
+기능을 완성할 때마다 변경 사항을 확인한다.
+```
+git status
+```
+변경된 파일을 추가한다.
+```
+git add main.py
+```
+커밋한다.
+```
+git commit -m "feat: add prompt list"
+```
+커밋 기록 확인:
+```
+git log --oneline
+```
+
+## 4-6. 기능별 커밋
+이번 프로젝트에서는 main 브랜치에서 바로 모든 기능을 수정하지 않고,
+프롬프트 목록 기능을 별도의 브랜치에서 개발하는 과정을 수행한다.
+```
+main
+ │
+ ├── 기본 프로그램
+ │
+ └── prompt-list 기능
+          │
+          ↓
+      기능 개발
+          │
+          ↓
+        merge
+          │
+          ↓
+        main
+```
+이를 통해 실제 협업 개발에서 사용되는 Branch → 개발 → Merge 과정을 경험한다.
+
+## 4-7. 기능 브랜치 생성
+현재 main 브랜치에서 새로운 브랜치를 생성한다.
+```
+git checkout -b feature/prompt-list
+```
+브랜치 확인:
+```
+git branch
+```
+
+## 4-8. Branch Merge
+개발한 기능을 main 브랜치에 병합한다.
+```
+git merge feature/prompt-list
+```
+정상적으로 병합되면
+feature 브랜치에서 개발한 기능이 main 브랜치에도 반영된다.
+
+🔀 Merge 구조
+```
+main
+ │
+ ├── 초기 코드
+ │
+ └───────────────┐
+                 │
+feature/prompt-list
+ │               │
+ ├── 목록 기능   │
+ │               │
+ └───────────────┘
+                 ↓
+              merge
+                 ↓
+               main
+```
+
+## 4-9. GitHub에 Push
+원격 저장소의 변경 사항을 로컬 저장소로 가져오기 위해 pull을 사용한다.
+```
+git pull origin main
+```
+
+## 4-10. Git 명령어 정리
+| 명령어               | 역할                    |
+| ----------------- | --------------------- |
+| `git init`        | 새로운 Git 저장소 생성        |
+| `git status`      | 현재 변경 상태 확인           |
+| `git add`         | 변경 파일을 커밋 대상으로 추가     |
+| `git commit`      | 변경 사항을 Git에 기록        |
+| `git push`        | 로컬 변경 사항을 GitHub에 업로드 |
+| `git pull`        | GitHub의 변경 사항을 로컬에 반영 |
+| `git checkout`    | 브랜치 이동                |
+| `git checkout -b` | 새로운 브랜치 생성 및 이동       |
+| `git merge`       | 브랜치의 변경 사항 병합         |
+| `git clone`       | 원격 Repository 복제      |
+| `git log`         | 커밋 기록 확인              |
+| `git branch`      | 브랜치 목록 확인             |
+
+## 4-11. 최종 Git 작업 흐름
+```
+              🧠 My Prompt Manager
+                       │
+                       ↓
+                 git init
+                       │
+                       ↓
+                기본 프로젝트
+                       │
+                       ↓
+                 git add .
+                       │
+                       ↓
+              첫 번째 commit
+                       │
+                       ↓
+             기능별 개발 / commit
+                       │
+                       ↓
+          🌿 feature/prompt-list
+                       │
+                       ↓
+                기능 개발
+                       │
+                       ↓
+                   commit
+                       │
+                       ↓
+               checkout main
+                       │
+                       ↓
+                    merge
+                       │
+                       ↓
+                    main
+                       │
+                       ↓
+                  git push
+                       │
+                       ↓
+              ☁️ GitHub Repository
+```
